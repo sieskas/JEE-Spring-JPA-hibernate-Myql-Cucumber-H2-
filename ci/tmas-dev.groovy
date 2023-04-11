@@ -9,11 +9,11 @@ pipeline {
         stage('Build & Test') {
             steps {
                 configFileProvider([configFile(fileId: '6877d451-0725-4fa5-921d-166084db20a2', variable: 'MAVEN_SETTINGS')]) {
-                    bat "mvn clean install -T 8 -s ${env.MAVEN_SETTINGS}"
+                    bat "mvn clean install -s ${env.MAVEN_SETTINGS}"
                 }
             }
         }
-        stage('Publish') {
+        stage('Publish to Nexus') {
             steps {
                 script {
                     def pomWeb= readMavenPom file: 'web/pom.xml'
@@ -26,12 +26,30 @@ pipeline {
                     def currentTime = new Date().format("yyyyMMddHHmmss")
                     def name = "${artifactWeb}-${commit.substring(0, 8)}-${version}"
                     def folderToZip = "web/target/${artifactWeb}-" + pom.version
-                    powershell(script: "Remove-item alias:curl")
-                    def resultWar = bat returnStdout: true, script: "curl -v -u admin:Passw0rd! --upload-file web\\target\\${artifactWeb}-${pom.version}.war http://192.168.250.88:7080/repository/nexus-snapshot-repo/${groupId.replace('.', '/')}/${artifactId}/${version}/${currentTime}-${commit}/${name}.war"
-                    powershell(script: "Compress-Archive ${folderToZip} web/target/${name}.zip")
-                    def resultZip = bat returnStdout: true, script: "curl -v -u admin:Passw0rd! --upload-file web\\target\\${name}.zip http://192.168.250.88:7080/repository/nexus-snapshot-repo/${groupId.replace('.', '/')}/${artifactId}/${version}/${currentTime}-${commit}/${name}.zip"
+
+                    withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASS')]) {
+                        powershell(script: "Remove-item alias:curl")
+                        def resultWar = bat returnStdout: true, script: "curl -v -u ${JENKINS_USER}:${JENKINS_PASS} --upload-file web\\target\\${artifactWeb}-${pom.version}.war http://devhost:7080/repository/nexus-snapshot-repo/${groupId.replace('.', '/')}/${artifactId}/${version}/${currentTime}-${commit}/${name}.war"
+                        powershell(script: "Compress-Archive ${folderToZip} web/target/${name}.zip")
+                        def resultZip = bat returnStdout: true, script: "curl -v -u ${JENKINS_USER}:${JENKINS_PASS} --upload-file web\\target\\${name}.zip http://devhost:7080/repository/nexus-snapshot-repo/${groupId.replace('.', '/')}/${artifactId}/${version}/${currentTime}-${commit}/${name}.zip"
+                    }
+
+
                 }
             }
+        }
+        stage('SonarQube analysis') {
+            steps {
+                bat 'mvn dependency-check:check'
+                withSonarQubeEnv(installationName: 'sonar') {
+                    bat 'mvn sonar:sonar -Dsonar.projectKey=Demo:dev -Dsonar.projectName=demo-dev'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            junit '**/surefire-reports/*.xml'
         }
     }
 }

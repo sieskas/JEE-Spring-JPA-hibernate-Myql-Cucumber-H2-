@@ -6,14 +6,14 @@ pipeline {
                 git branch: 'master', credentialsId: 'gitea', url: 'http://devhost:3000/SMS-Storetraffic/demo.git'
             }
         }
-        stage('Build & test') {
+        stage('Build & Test') {
             steps {
                 configFileProvider([configFile(fileId: '6877d451-0725-4fa5-921d-166084db20a2', variable: 'MAVEN_SETTINGS')]) {
                     bat "mvn clean install -s ${env.MAVEN_SETTINGS}"
                 }
             }
         }
-        stage('Publish') {
+        stage('Publish to Nexus') {
             steps {
                 script {
                     def pomWeb= readMavenPom file: 'web/pom.xml'
