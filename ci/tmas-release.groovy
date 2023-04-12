@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Git Clone') {
             steps {
-                git branch: 'master', credentialsId: 'gitea', url: 'http://192.168.250.88:3000/storetraffic-backend/tmas.git'
+                git branch: 'master', credentialsId: 'gitea', url: 'http://devhost:3000/SMS-Storetraffic/demo.git'
             }
         }
         stage('Build & Test') {
@@ -79,25 +79,29 @@ pipeline {
                     bat "mvn clean install -T 8 -DskipTests -s ${env.MAVEN_SETTINGS}"
                 }
                 script {
-                    def pomWeb = readMavenPom file: 'web/pom.xml'
-                    def pom = readMavenPom file: 'pom.xml'
-                    def groupId = pom.groupId
-                    def artifactId = pom.artifactId
-                    def artifactWeb = pomWeb.artifactId
-                    def version = pom.version
-                    def name = "${artifactWeb}-${version}"
-                    def folderToZip = "web/target/${artifactWeb}-" + pom.version
-                    powershell(script: "Remove-item alias:curl")
-                    def resultWar = bat returnStdout: true, script: "curl -v -u admin:Passw0rd! --upload-file web\\target\\${artifactWeb}-${pom.version}.war http://192.168.250.88:7080/repository/nexus-release-repo/${groupId.replace('.', '/')}/storetraffic/${artifactWeb}/${version}/${name}.war"
-                    powershell(script: "Compress-Archive ${folderToZip} web/target/${name}.zip")
-                    def resultZip = bat returnStdout: true, script: "curl -v -u admin:Passw0rd! --upload-file web\\target\\${name}.zip http://192.168.250.88:7080/repository/nexus-release-repo/${groupId.replace('.', '/')}/storetraffic/${artifactWeb}/${version}/${name}.zip"
+                    withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASS')]) {
+                        def pomWeb = readMavenPom file: 'web/pom.xml'
+                        def pom = readMavenPom file: 'pom.xml'
+                        def groupId = pom.groupId
+                        def artifactId = pom.artifactId
+                        def artifactWeb = pomWeb.artifactId
+                        def version = pom.version
+                        def name = "${artifactWeb}-${version}"
+                        def folderToZip = "web/target/${artifactWeb}-" + pom.version
+                        powershell(script: "Remove-item alias:curl")
+                        def resultWar = bat returnStdout: true, script: "curl -v -u ${JENKINS_USER}:${JENKINS_PASS} --upload-file web\\target\\${artifactWeb}-${pom.version}.war http://devhost:7080/repository/nexus-release-repo/${groupId.replace('.', '/')}/storetraffic/${artifactWeb}/${version}/${name}.war"
+                        powershell(script: "Compress-Archive ${folderToZip} web/target/${name}.zip")
+                        def resultZip = bat returnStdout: true, script: "curl -v -u ${JENKINS_USER}:${JENKINS_PASS} --upload-file web\\target\\${name}.zip http://devhost:7080/repository/nexus-release-repo/${groupId.replace('.', '/')}/storetraffic/${artifactWeb}/${version}/${name}.zip"
+                    }
                 }
             }
         }
 
         stage('Create Gitea Release') {
             steps {
-                script {
+                script
+                withCredentials([string(credentialsId: 'gitea', variable: 'GIT_TOKEN')]) {
+
                     def pomWeb = readMavenPom file: 'web/pom.xml'
                     def pom = readMavenPom file: 'pom.xml'
                     def version = pom.version
@@ -106,22 +110,21 @@ pipeline {
                     def artifactId = pom.artifactId
                     def artifactWeb = pomWeb.artifactId
                     def name = "${artifactWeb}-${version}"
-                    def warURL = "http://192.168.250.88:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.war"
-                    def zipURL = "http://192.168.250.88:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.zip"
+                    def warURL = "http://devhost:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.war"
+                    def zipURL = "http://devhost:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.zip"
 
                     echo "name=" + name
-                    echo "warURL="  + warURL
+                    echo "warURL=" + warURL
                     echo "zipURL=" + zipURL
                     def releaseBody = """
                 Download the artifacts:
                 - [WAR file](${warURL})
                 - [ZIP file](${zipURL})
                 """
-                    def result = bat returnStdout: true, script: "curl -X POST \"http://192.168.250.88:3000/api/v1/repos/storetraffic-backend/tmas/releases\" -H \"accept: application/json\" -H \"authorization: token 536f90d21d76e8eecdffca6a08cf1d9ba5ed2289\" -H \"Content-Type: application/json\" -d \"{\\\"body\\\": \\\"Download the artifacts:\\n- [WAR file](" + warURL + ")\\n- [ZIP file](" + zipURL + ")\\\", \\\"name\\\": \\\"Release " + tagName + "\\\", \\\"tag_name\\\": \\\"" + tagName + "\\\", \\\"target_commitish\\\": \\\"master\\\"}\""
-
+                    def result = bat returnStdout: true, script: "curl -X POST \"http://devhost:3000/api/v1/repos/SMS-Storetraffic/demo/releases\" -H \"accept: application/json\" -H \"authorization: token "+ GIT_TOKEN +"\" -H \"Content-Type: application/json\" -d \"{\\\"body\\\": \\\"Download the artifacts:\\n- [WAR file](" + warURL + ")\\n- [ZIP file](" + zipURL + ")\\\", \\\"name\\\": \\\"Release " + tagName + "\\\", \\\"tag_name\\\": \\\"" + tagName + "\\\", \\\"target_commitish\\\": \\\"master\\\"}\""
                 }
-
             }
+
         }
     }
 }
