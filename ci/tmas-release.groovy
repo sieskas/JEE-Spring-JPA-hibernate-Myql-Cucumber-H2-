@@ -99,32 +99,32 @@ pipeline {
 
         stage('Create Gitea Release') {
             steps {
-                script
-                withCredentials([string(credentialsId: 'gitea', variable: 'GIT_TOKEN')]) {
+                script {
+                    withCredentials([string(credentialsId: 'gitea', variable: 'GIT_TOKEN')]) {
 
-                    def pomWeb = readMavenPom file: 'web/pom.xml'
-                    def pom = readMavenPom file: 'pom.xml'
-                    def version = pom.version
-                    def tagName = "v${version}"
-                    def groupId = pom.groupId.replace('.', '/')
-                    def artifactId = pom.artifactId
-                    def artifactWeb = pomWeb.artifactId
-                    def name = "${artifactWeb}-${version}"
-                    def warURL = "http://devhost:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.war"
-                    def zipURL = "http://devhost:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.zip"
+                        def pomWeb = readMavenPom file: 'web/pom.xml'
+                        def pom = readMavenPom file: 'pom.xml'
+                        def version = pom.version
+                        def tagName = "v${version}"
+                        def groupId = pom.groupId.replace('.', '/')
+                        def artifactId = pom.artifactId
+                        def artifactWeb = pomWeb.artifactId
+                        def name = "${artifactWeb}-${version}"
+                        def warURL = "http://devhost:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.war"
+                        def zipURL = "http://devhost:7080/repository/nexus-release-repo/${groupId}/storetraffic/${artifactWeb}/${version}/${name}.zip"
 
-                    echo "name=" + name
-                    echo "warURL=" + warURL
-                    echo "zipURL=" + zipURL
-                    def releaseBody = """
+                        echo "name=" + name
+                        echo "warURL=" + warURL
+                        echo "zipURL=" + zipURL
+                        def releaseBody = """
                 Download the artifacts:
                 - [WAR file](${warURL})
                 - [ZIP file](${zipURL})
                 """
-                    def result = bat returnStdout: true, script: "curl -X POST \"http://devhost:3000/api/v1/repos/SMS-Storetraffic/demo/releases\" -H \"accept: application/json\" -H \"authorization: token "+ GIT_TOKEN +"\" -H \"Content-Type: application/json\" -d \"{\\\"body\\\": \\\"Download the artifacts:\\n- [WAR file](" + warURL + ")\\n- [ZIP file](" + zipURL + ")\\\", \\\"name\\\": \\\"Release " + tagName + "\\\", \\\"tag_name\\\": \\\"" + tagName + "\\\", \\\"target_commitish\\\": \\\"master\\\"}\""
+                        def result = bat returnStdout: true, script: "curl -X POST \"http://devhost:3000/api/v1/repos/SMS-Storetraffic/demo/releases\" -H \"accept: application/json\" -H \"authorization: token " + GIT_TOKEN + "\" -H \"Content-Type: application/json\" -d \"{\\\"body\\\": \\\"Download the artifacts:\\n- [WAR file](" + warURL + ")\\n- [ZIP file](" + zipURL + ")\\\", \\\"name\\\": \\\"Release " + tagName + "\\\", \\\"tag_name\\\": \\\"" + tagName + "\\\", \\\"target_commitish\\\": \\\"master\\\"}\""
+                    }
                 }
             }
-
         }
     }
 }
