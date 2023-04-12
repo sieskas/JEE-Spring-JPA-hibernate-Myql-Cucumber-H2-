@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.example</groupId>
         <artifactId>demo</artifactId>
-        <version>1.1.1.0</version>
+        <version>1.1.1.1</version>
     </parent>
     <artifactId>web</artifactId>
     <name>web</name>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>database</artifactId>
-            <version>1.1.1.0</version>
+            <version>1.1.1.1</version>
         </dependency>
 
         <dependency>
