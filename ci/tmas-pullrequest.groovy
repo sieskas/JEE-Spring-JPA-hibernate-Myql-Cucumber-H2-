@@ -1,6 +1,4 @@
 import groovy.json.JsonOutput
-//import java.util.regex.Matcher
-//import java.util.regex.Pattern
 
 def notifyCommitStatus(String state, String message) {
     script {
@@ -20,41 +18,14 @@ def notifyCommitStatus(String state, String message) {
     }
 }
 
-//def getJson(String reponse) {
-//    echo "Réponse : ${reponse}"
-//    def pattern = Pattern.compile("(\\{.*\\})")
-//    def matcher = pattern.matcher(reponse)
-//    if (matcher.find()) {
-//        reponse = matcher.group(1)
-//    }
-//    echo "Réponse JSON : ${reponse}"
-//    def jsonSlurper = new groovy.json.JsonSlurper()
-//    return jsonSlurper.parseText(reponse)
-//}
-//
-//def getSonarQubeMetrics(String projectKey, String metricKeys, String token) {
-//    def url = "http://devhost:7090/api/measures/component?component=${projectKey}&metricKeys=${metricKeys}"
-//    def reponse = bat(returnStdout: true, script: "curl -s -u ${token}: \"${url}\"").trim()
-//    return getJson(reponse).component.measures
-//}
-
-//def deleteProjetSonar(String projectKey, String token) {
-//    def url = "http://devhost:7090/api/projects/delete?project=${projectKey}"
-//    def reponse = bat(returnStdout: true, script: "curl -s -u ${token}: -X POST \"${url}\"").trim()
-//    echo "Réponse JSON : ${reponse}"
-//}
-//
-//def createCopyProjet(String from, String to, String name, String token) {
-//    def url = "http://devhost:7090/api/projects/create_copy?from=${from}&to=${to}&name=${name}"
-//    def reponse = bat(returnStdout: true, script: "curl -s -u ${token}: -X POST \"${url}\"").trim()
-//    echo "Réponse JSON : ${reponse}"
-//}
-
 pipeline {
     agent any
     stages {
         stage('Build & test') {
             steps {
+                echo "envID: pr-${env.CHANGE_ID}_${env.GIT_BRANCH}"
+                echo "envID: pr-${env.CHANGE_ID}_${env.CHANGE_FORK}"
+                echo "envID: pr-${env.CHANGE_ID}_${env.CHANGE_TARGET}"
                 configFileProvider([configFile(fileId: '6877d451-0725-4fa5-921d-166084db20a2', variable: 'MAVEN_SETTINGS')]) {
                     script {
                         try {
@@ -77,11 +48,34 @@ pipeline {
                             bat "mvn sonar:sonar -Dsonar.projectKey=Demo:pullrequest -Dsonar.projectName=demo-pullrequest -Dsonar.qualitygate.wait=true"
                         }
 
+                    } catch (Exception e) {
+                        notifyCommitStatus("FAILURE", 'Build and test failed')
+                        throw e
+                    }
+                }
+            }
+        }
+        stage('Publish to Nexus') {
+            steps {
+                script {
+                    try {
+                        notifyCommitStatus("PENDING", 'Publish to Nexus')
+                        def pomWeb = readMavenPom file: 'web/pom.xml'
+                        def pom = readMavenPom file: 'pom.xml'
+                        def artifactWeb = pomWeb.artifactId
+
+                        def nameNexus = "pr-${env.CHANGE_ID}_${env.GIT_BRANCH}"
+
+                        withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASS')]) {
+                            def resultWar = bat returnStdout: true, script: "curl -v -u ${JENKINS_USER}:${JENKINS_PASS} --upload-file web\\target\\${artifactWeb}-${pom.version}.war http://devhost:7080/repository/nexus-pullrequest-repo/com/pullrequest/${nameNexus}/SNAPSHOT/${nameNexus}-SNAPSHOT.war"
+                        }
                         notifyCommitStatus("SUCCESS", 'Build and test succeeded')
                     } catch (Exception e) {
                         notifyCommitStatus("FAILURE", 'Build and test failed')
                         throw e
                     }
+
+
                 }
             }
         }

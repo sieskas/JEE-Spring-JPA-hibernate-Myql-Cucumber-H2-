@@ -46,6 +46,29 @@ pipeline {
                 }
             }
         }
+        stage('Download and Deploy WAR') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASS')]) {
+                        def isRunning = powershell(returnStdout: true, script: "Get-NetTCPConnection -LocalPort 8080 -State Listen").trim()
+                        if (isRunning == "") {
+                            bat "net start Tomcat8"
+                        } else {
+                            echo "Tomcat is already running"
+                        }
+
+                        def pom = readMavenPom file: 'pom.xml'
+                        def artifactWeb = pomWeb.artifactId
+
+                        def path = "web\\target\\${artifactWeb}-${pom.version}.war"
+
+                        bat "copy /Y ${path} C:\\tomcat\\webapps\\master.war"
+                        echo "url manager tomcat: http://devhost:8080/host-manager/html"
+                        echo "webapp : http://devhost:8080/master"
+                    }
+                }
+            }
+        }
     }
     post {
         always {
