@@ -57,6 +57,7 @@ pipeline {
                             echo "Tomcat is already running"
                         }
 
+                        def pomWeb = readMavenPom file: 'web/pom.xml'
                         def pom = readMavenPom file: 'pom.xml'
                         def artifactWeb = pomWeb.artifactId
 
