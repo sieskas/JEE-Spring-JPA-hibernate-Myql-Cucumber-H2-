@@ -19,7 +19,7 @@
     </div>
     <% session.removeAttribute("successMessage");
     } %>
-    <h1>User List</h1>
+    <h1>User List test</h1>
     <a href="create-user.jsp" class="btn btn-primary mb-3">Create User</a>
     <table class="table">
         <thead>
