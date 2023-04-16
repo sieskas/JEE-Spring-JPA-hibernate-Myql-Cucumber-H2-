@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <h1>Create User</h1>
-    <form method="post" action="/create-user">
+    <form method="post" action="${pageContext.request.contextPath}/create-user">
         <div class="form-group">
             <label for="name">Name</label>
             <input type="text" name="name" class="form-control" id="name">
