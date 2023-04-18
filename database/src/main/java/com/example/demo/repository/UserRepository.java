@@ -9,4 +9,8 @@ public interface UserRepository {
     List<UserEntity> findAll();
 
     Integer save(UserEntity domaineToEntity);
+
+    UserEntity getUserByEmail(String email);
+
+    void deleteById(int id);
 }

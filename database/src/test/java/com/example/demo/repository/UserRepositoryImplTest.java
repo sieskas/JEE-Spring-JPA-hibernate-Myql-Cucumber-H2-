@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,4 +47,20 @@ class UserRepositoryImplTest {
 
         assertEquals(expectedUserId, actualUserId);
     }
+
+    @Test
+    void getUserByEmail_shouldReturnUser() {
+        UserEntity userEntityExpected = UserEntity.builder().build();
+        when(daoProvider.getQueryToSingleResult(any(), any(), any())).thenReturn(userEntityExpected);
+
+        UserEntity userEntity = userRepository.getUserByEmail("test@a.com");
+
+        assertEquals(userEntityExpected, userEntity);
+    }
+
+    @Test
+    void deleteById_shouldReturnUser() {
+        assertDoesNotThrow(() -> userRepository.deleteById(1));
+    }
+
 }

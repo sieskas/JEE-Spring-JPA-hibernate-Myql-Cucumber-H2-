@@ -9,4 +9,6 @@ public interface UserService {
     List<User> getUsers();
 
     void saveUser(User user);
+
+    User deleteUserByEmail(String email);
 }

@@ -14,7 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,5 +68,14 @@ class UserServiceImplTest {
 
         verify(userMapper).domaineToEntity(user);
         verify(userRepository).save(userEntity);
+    }
+
+    @Test
+    void testDeleteUser() {
+        UserEntity userEntity = UserEntity.builder().id(1).build();
+        when(userRepository.getUserByEmail(anyString())).thenReturn(userEntity);
+        assertDoesNotThrow(() ->
+                userService.deleteUserByEmail("test@example.com")
+        );
     }
 }

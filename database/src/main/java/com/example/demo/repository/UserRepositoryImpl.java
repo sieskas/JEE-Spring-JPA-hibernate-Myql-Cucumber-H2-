@@ -24,4 +24,14 @@ public class UserRepositoryImpl implements UserRepository {
         return daoProvider.saveEntity(userEntity);
     }
 
+    @Override
+    public UserEntity getUserByEmail(String email) {
+        return daoProvider.getQueryToSingleResult("SELECT * FROM users where email = :param0", UserEntity.class, email);
+    }
+
+    @Override
+    public void deleteById(int id) {
+        daoProvider.executeUpdate("DELETE FROM users WHERE id = :param0", UserEntity.class, id);
+    }
+
 }

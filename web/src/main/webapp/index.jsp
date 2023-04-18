@@ -27,6 +27,7 @@
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -36,6 +37,12 @@
                 <td><%= ++i %></td>
                 <td>${user.username}</td>
                 <td>${user.email}</td>
+                <td> <%-- New column with form and Delete button --%>
+                    <form action="${pageContext.request.contextPath}/delete-user" method="post">
+                        <input type="hidden" name="email" value="${user.email}" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
             </tr>
         </c:forEach>
         </tbody>
