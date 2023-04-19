@@ -24,17 +24,11 @@ public class UserListServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
-        List<UserResource> userResourceList = (List<UserResource>) session.getAttribute("userList");
+        List<UserResource> userResourceList = userMapper.domainToResource(userService.getUsers());
 
-        if (userResourceList == null) {
-            userResourceList = userMapper.domainToResource(userService.getUsers());
-            session.setAttribute("userList", userResourceList);
-        }
         // Set the user list as an attribute of the request
         request.setAttribute("userList", userResourceList);
-
         // Forward to the JSP page
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        request.getRequestDispatcher("/user-list.jsp").forward(request, response);
     }
 }

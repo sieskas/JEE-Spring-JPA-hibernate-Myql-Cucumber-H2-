@@ -8,7 +8,9 @@ public interface UserService {
 
     List<User> getUsers();
 
-    void saveUser(User user);
+    void saveUser(User user, String password);
 
     User deleteUserByEmail(String email);
+
+    boolean authenticateUser(String username, String password);
 }

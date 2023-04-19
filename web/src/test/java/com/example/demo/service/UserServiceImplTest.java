@@ -28,9 +28,10 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private AuthentificationService authentificationService;
 
     private List<UserEntity> userEntities;
     private List<User> users;
@@ -60,12 +61,13 @@ class UserServiceImplTest {
 
     @Test
     void testSaveUser() {
+        String password = "password";
         User user = User.builder().build();
         UserEntity userEntity = UserEntity.builder().build();
         when(userMapper.domaineToEntity(user)).thenReturn(userEntity);
+        when(authentificationService.hashPassword(password)).thenReturn("asdadad:dsadwdadadwadada");
 
-        userService.saveUser(user);
-
+        userService.saveUser(user, password);
         verify(userMapper).domaineToEntity(user);
         verify(userRepository).save(userEntity);
     }

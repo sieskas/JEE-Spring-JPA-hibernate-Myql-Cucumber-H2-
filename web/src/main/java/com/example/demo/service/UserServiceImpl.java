@@ -18,6 +18,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Inject
     private UserMapper userMapper;
+    @Inject
+    private AuthentificationService authentificationService;
 
     @Override
     public List<User> getUsers() {
@@ -25,14 +27,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
-        userRepository.save(userMapper.domaineToEntity(user));
+    public void saveUser(User user, String password) {
+        UserEntity userEntity = userMapper.domaineToEntity(user);
+        userEntity.setPassword(authentificationService.hashPassword(password));
+        userRepository.save(userEntity);
     }
     @Override
     public User deleteUserByEmail(String email) {
         UserEntity userEntity = userRepository.getUserByEmail(email);
         userRepository.deleteById(userEntity.getId());
         return userMapper.entityToDomain(userEntity);
+    }
+
+    @Override
+    public boolean authenticateUser(String username, String password) {
+        UserEntity userEntity = userRepository.getUserByEmail(username);
+        return authentificationService.verifyPassword(password, userEntity.getPassword());
     }
 
 }

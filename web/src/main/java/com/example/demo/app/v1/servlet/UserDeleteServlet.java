@@ -30,17 +30,10 @@ public class UserDeleteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         // Get the name and email from the form data
         try {
-            List<UserResource> userResourceList = (List<UserResource>) request.getSession().getAttribute("userList");
-
             String email = request.getParameter("email");
 
-            User user = userService.deleteUserByEmail(email);
-            userResourceList.remove(userMapper.domainToResource(user));
-
-            // Redirect to the user list page with a success message
-            HttpSession session = request.getSession();
-            request.getSession().setAttribute("userList", userResourceList);
-            session.setAttribute("successMessage", "User deleted successfully.");
+            userService.deleteUserByEmail(email);
+            //session.setAttribute("successMessage", "User deleted successfully.");
             response.sendRedirect(request.getContextPath() + "/user-list");
         } catch (IOException e) {
             logger.info(e);

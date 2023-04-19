@@ -31,16 +31,10 @@ class UserDeleteServletTest {
     private UserService userService;
 
     @Mock
-    private UserMapper userMapper;
-
-    @Mock
     private HttpServletRequest request;
 
     @Mock
     private HttpServletResponse response;
-
-    @Mock
-    private HttpSession session;
 
     private String email;
     private List<UserResource> userResourceList;
@@ -53,11 +47,8 @@ class UserDeleteServletTest {
         userResourceList = new ArrayList<>();
         userResourceList.add(userResource);
 
-        when(request.getSession()).thenReturn(session);
-        when(session.getAttribute("userList")).thenReturn(userResourceList);
         when(request.getParameter("email")).thenReturn(email);
         when(userService.deleteUserByEmail(email)).thenReturn(user);
-        when(userMapper.domainToResource(user)).thenReturn(userResource);
         when(request.getContextPath()).thenReturn("");
     }
 
@@ -66,8 +57,6 @@ class UserDeleteServletTest {
         userDeleteServlet.doPost(request, response);
 
         verify(userService).deleteUserByEmail(email);
-        verify(session).setAttribute("userList", userResourceList);
-        verify(session).setAttribute("successMessage", "User deleted successfully.");
         verify(response).sendRedirect("/user-list");
     }
 
