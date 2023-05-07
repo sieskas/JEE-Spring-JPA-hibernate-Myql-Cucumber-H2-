@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 import org.reflections.Reflections;
+import org.springframework.stereotype.Component;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -13,8 +14,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-@Named
-@ApplicationScoped
+@Component
 public class  DaoProvider {
 
     private final SessionFactory factory;

@@ -4,3 +4,5 @@
 /.mvn/
 /.idea/
 **/target/
+/tomcat.8080/
+/temp/

@@ -1,17 +1,18 @@
 package com.example.demo.repository;
 
 import com.example.demo.repository.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
 
-@Named
-@ApplicationScoped
+@Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    @Inject
+    @Autowired
     private DaoProvider daoProvider;
 
     @Override

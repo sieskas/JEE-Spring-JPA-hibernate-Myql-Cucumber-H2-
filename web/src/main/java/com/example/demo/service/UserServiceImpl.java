@@ -4,21 +4,19 @@ import com.example.demo.app.v1.mapper.UserMapper;
 import com.example.demo.domain.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 
-@Named
-@ApplicationScoped
+@Service
 public class UserServiceImpl implements UserService {
 
-    @Inject
+    @Autowired
     private UserRepository userRepository;
-    @Inject
+    @Autowired
     private UserMapper userMapper;
-    @Inject
+    @Autowired
     private AuthentificationService authentificationService;
 
     @Override

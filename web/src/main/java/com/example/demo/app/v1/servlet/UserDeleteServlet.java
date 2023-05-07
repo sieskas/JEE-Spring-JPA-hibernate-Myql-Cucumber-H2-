@@ -6,6 +6,7 @@ import com.example.demo.domain.User;
 import com.example.demo.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
@@ -17,11 +18,11 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "DeleteUserServlet", value = "/delete-user")
-public class UserDeleteServlet extends HttpServlet {
+public class UserDeleteServlet extends SpringInjectedHttpServlet {
 
-    @Inject
+    @Autowired
     private UserService userService;
-    @Inject
+    @Autowired
     private UserMapper userMapper;
 
     private final Logger logger = LogManager.getLogger(UserDeleteServlet.class);

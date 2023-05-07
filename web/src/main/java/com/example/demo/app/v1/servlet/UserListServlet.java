@@ -3,6 +3,7 @@ package com.example.demo.app.v1.servlet;
 import com.example.demo.app.v1.mapper.UserMapper;
 import com.example.demo.app.v1.resources.UserResource;
 import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -15,10 +16,10 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "user-list", value = "/user-list")
-public class UserListServlet extends HttpServlet {
-    @Inject
+public class UserListServlet extends SpringInjectedHttpServlet {
+    @Autowired
     private UserService userService;
-    @Inject
+    @Autowired
     private UserMapper userMapper;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)

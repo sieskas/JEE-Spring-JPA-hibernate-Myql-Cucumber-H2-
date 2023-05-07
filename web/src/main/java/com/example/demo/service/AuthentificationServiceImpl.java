@@ -2,14 +2,14 @@ package com.example.demo.service;
 
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
+import org.springframework.stereotype.Service;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-@Named
-@ApplicationScoped
+@Service
 public class AuthentificationServiceImpl implements AuthentificationService {
 
     private final byte[] hash;
