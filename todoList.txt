@@ -1,0 +1,60 @@
+Create a properties file, for example, config.properties, and set the active profile in it:
+spring.profiles.active=local
+
+Load the properties from this file into a PropertyPlaceholderConfigurer bean in your Spring configuration file (e.g., spring-config.xml):
+<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+        <list>
+            <value>classpath:config.properties</value>
+        </list>
+    </property>
+</bean>
+
+Use the loaded property to set the active profile in the Spring configuration:
+<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+        <list>
+            <value>classpath:config.properties</value>
+        </list>
+    </property>
+</bean>
+
+
+<beans profile="${spring.profiles.active}">
+    <!-- Profile-specific configuration -->
+</beans>
+
+
+------
+
+
+Properties file:
+Create an application.properties file in src/main/resources and add the following property:
+spring.profiles.active=test
+
+YAML file:
+Create an application.yml file in src/main/resources and add the following property:
+spring:
+  profiles:
+    active: test
+
+Modify the CucumberTestBase class to load the properties or YAML file into a PropertySource. You can use the PropertySourcesPlaceholderConfigurer class for this. Here's how to do i
+
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
+
+// ...
+
+protected void startTomcat() throws LifecycleException {
+    // Load the properties or YAML file
+    PropertySourcesPlaceholderConfigurer propertyConfigurer = new PropertySourcesPlaceholderConfigurer();
+    propertyConfigurer.setLocation(new ClassPathResource("application.properties")); // Replace with "application.yml" for a YAML file
+    propertyConfigurer.setIgnoreUnresolvablePlaceholders(true);
+    propertyConfigurer.setIgnoreResourceNotFound(false);
+    propertyConfigurer.setOrder(-100);
+    propertyConfigurer.setEnvironment(ctx.getEnvironment());
+    ctx.addBeanFactoryPostProcessor(propertyConfigurer);
+
+    tomcat.start();
+    injectAutowiredBeans();
+}
