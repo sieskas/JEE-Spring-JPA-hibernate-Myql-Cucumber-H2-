@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.context.ApplicationContext;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -49,7 +48,7 @@ public abstract class CucumberTestBase {
         WebResourceRoot resources = new StandardRoot(ctx);
         resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes",
                 additionWebInfClasses.getAbsolutePath(), "/"));
-        File springConfigFile = new File(test, "WEB-INF/spring/spring-config.xml");
+        File springConfigFile = new File(test, "spring-config-h2.xml");
         resources.addPreResources(new FileResourceSet(resources, "/WEB-INF/spring/spring-config.xml", springConfigFile.getAbsolutePath(), "/"));
         ctx.setResources(resources);
 
