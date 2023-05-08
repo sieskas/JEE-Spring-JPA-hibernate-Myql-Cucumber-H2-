@@ -26,7 +26,7 @@ public abstract class CucumberTestBase {
     protected int port;
     private StandardContext ctx;
 
-    public CucumberTestBase() throws LifecycleException, IOException {
+    public CucumberTestBase() throws IOException {
         String webappDirLocation = "src/main/webapp/";
         tomcat = new Tomcat();
 
