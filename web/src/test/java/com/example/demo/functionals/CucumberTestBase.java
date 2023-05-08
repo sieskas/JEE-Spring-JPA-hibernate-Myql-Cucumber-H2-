@@ -7,6 +7,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
+import org.apache.catalina.webresources.FileResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
@@ -44,10 +45,15 @@ public abstract class CucumberTestBase {
         // Declare an alternative location for your "WEB-INF/classes" dir
         // Servlet 3.0 annotation will work
         File additionWebInfClasses = new File("target/classes");
+        File test = new File("src/test/resources");
         WebResourceRoot resources = new StandardRoot(ctx);
         resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes",
                 additionWebInfClasses.getAbsolutePath(), "/"));
+        File springConfigFile = new File(test, "WEB-INF/spring/spring-config.xml");
+        resources.addPreResources(new FileResourceSet(resources, "/WEB-INF/spring/spring-config.xml", springConfigFile.getAbsolutePath(), "/"));
         ctx.setResources(resources);
+
+        //ctx.setAltDDName();
 
         // Créer une instance de DatabaseInitializer et l'ajouter en tant que ServletContextListener
         //ctx.addApplicationListener(DatabaseInitializer.class.getName());

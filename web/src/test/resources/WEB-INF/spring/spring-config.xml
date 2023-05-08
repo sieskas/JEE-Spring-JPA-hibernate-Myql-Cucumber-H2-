@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/data/jpa
+           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <!-- Autres configurations -->
+
+    <!-- Active les annotations JPA et Spring Data -->
+    <jpa:repositories base-package="com.example.demo.repository"/>
+
+    <!-- Configuration de Liquibase -->
+    <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+        <property name="dataSource" ref="dataSource" />
+        <property name="changeLog" value="classpath:db.changelog-master.xml" />
+    </bean>
+
+    <!-- Configuration de la source de données -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:test;;mode=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS DBO;"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
+    <!-- Configuration de JPA et Hibernate -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.example.demo.repository.entity"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="generateDdl" value="true"/>
+                <property name="showSql" value="true"/>
+            </bean>
+        </property>
+        <!-- Configuration des propriétés spécifiques à Hibernate -->
+        <property name="jpaProperties">
+            <props>
+                <prop key="show_sql">true</prop>
+                <prop key="format_sql">true</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">none</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Configuration du gestionnaire de transactions -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!-- Active la gestion des transactions basée sur les annotations -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- Active le scan des composants pour détecter les beans annotés -->
+    <context:component-scan base-package="com.example.demo"/>
+
+</beans>

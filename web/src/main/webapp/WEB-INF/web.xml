@@ -10,17 +10,7 @@
 <!--        <welcome-file>login</welcome-file>-->
 <!--    </welcome-file-list>-->
 
-    <!--param-name>contextConfigLocation</param-name>
-    <param-value>classpath*:META-INF/spring/applicationContext*.xml</param-value>
-</context-param-->
 
-    <!-- Weld listener -->
-<!--    <listener>-->
-<!--        <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>-->
-<!--    </listener>-->
-
-
-    <!-- Configuration de Spring -->
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
