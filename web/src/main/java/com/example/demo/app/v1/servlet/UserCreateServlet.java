@@ -45,6 +45,7 @@ public class UserCreateServlet extends SpringInjectedHttpServlet {
             // Add the user to the list of users
             // Redirect to the user list page with a success message
             //session.setAttribute("successMessage", "User created successfully.");
+            response.setStatus(HttpServletResponse.SC_CREATED);
             response.sendRedirect(request.getContextPath() + "/user-list");
         } catch (IOException e) {
             logger.info(e);

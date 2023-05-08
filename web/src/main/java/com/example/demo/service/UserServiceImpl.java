@@ -32,14 +32,14 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public User deleteUserByEmail(String email) {
-        UserEntity userEntity = userRepository.getUserByEmail(email);
+        UserEntity userEntity = userRepository.getUserEntityByEmail(email);
         userRepository.deleteById(userEntity.getId());
         return userMapper.entityToDomain(userEntity);
     }
 
     @Override
     public boolean authenticateUser(String username, String password) {
-        UserEntity userEntity = userRepository.getUserByEmail(username);
+        UserEntity userEntity = userRepository.getUserEntityByEmail(username);
         return authentificationService.verifyPassword(password, userEntity.getPassword());
     }
 

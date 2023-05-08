@@ -1,7 +1,6 @@
-package com.example.demo.app.v1.servlet;
+package com.example.demo.functionals;
 
-import com.example.demo.repository.config.DatabaseInitializer;
-import org.apache.catalina.Context;
+//import com.example.demo.repository.config.DatabaseInitializer;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
@@ -37,7 +36,7 @@ public class EmbeddedTomcat {
         ctx.setResources(resources);
 
         // Créer une instance de DatabaseInitializer et l'ajouter en tant que ServletContextListener
-        ctx.addApplicationListener(DatabaseInitializer.class.getName());
+        //ctx.addApplicationListener(DatabaseInitializer.class.getName());
 
 
         tomcat.start();

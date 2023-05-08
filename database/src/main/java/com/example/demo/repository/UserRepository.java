@@ -1,16 +1,15 @@
 package com.example.demo.repository;
 
 import com.example.demo.repository.entity.UserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface UserRepository {
+@Repository
+public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
+    UserEntity getUserEntityByEmail(String email);
     List<UserEntity> findAll();
 
-    Integer save(UserEntity domaineToEntity);
-
-    UserEntity getUserByEmail(String email);
-
-    void deleteById(int id);
 }

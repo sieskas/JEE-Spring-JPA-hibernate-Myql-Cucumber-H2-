@@ -75,7 +75,7 @@ class UserServiceImplTest {
     @Test
     void testDeleteUser() {
         UserEntity userEntity = UserEntity.builder().id(1).build();
-        when(userRepository.getUserByEmail(anyString())).thenReturn(userEntity);
+        when(userRepository.getUserEntityByEmail(anyString())).thenReturn(userEntity);
         assertDoesNotThrow(() ->
                 userService.deleteUserByEmail("test@example.com")
         );
